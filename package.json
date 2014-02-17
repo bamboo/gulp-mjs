@@ -1,0 +1,37 @@
+{
+  "name": "gulp-mjs",
+  "version": "0.0.1",
+  "description": "Compiles Metascript files.",
+  "main": "index.js",
+  "dependencies": {
+    "event-stream": "~3.0.20",
+    "meta-script": "~0.0.8",
+    "gulp-util": "~2.2.1",
+    "streamifier": "~0.1.0"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bamboo/gulp-mjs.git"
+  },
+  "keywords": [
+    "gulpplugin",
+    "metascript"
+  ],
+  "author": "Rodrigo B. de Oliveira <rbo@acm.org>",
+  "engines": {
+    "node": ">=0.8"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://github.com/bamboo/gulp-mjs/raw/master/LICENSE"
+    }
+  ]
+}
