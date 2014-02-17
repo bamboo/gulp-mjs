@@ -14,23 +14,21 @@ function compileFile(file, done) {
     return done(null, file);
 
   var stream = file.isStream() ? file.contents : streamify(file.contents);
-  var compiler = Meta.createCompiler({name: file.name});
+  var compiler = Meta.createLineStreamCompiler(file.name);
   return es.pipeline(
     stream,
     es.split(),
     es.through(
       function processLine(line) {
         try {
-            compiler.parser.processLine(line);
+            compiler.onLine(line);
         } catch (e) {
             done(e, null);
         }
       },
       function end() {
         try {
-          compiler.parseDone();
-          var ast = compiler.produceAst();
-          var result = compiler.generate(ast);
+          var result = compiler.done();
           var jsFile = new gutil.File({
               cwd: file.cwd,
               base: file.base,
