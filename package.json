@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "event-stream": "~3.0.20",
+    "through2": "~0.4.1",
     "meta-script": "~0.0.8",
     "gulp-util": "~2.2.1",
     "streamifier": "~0.1.0"

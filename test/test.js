@@ -13,23 +13,50 @@ var createFile = function (filepath, contents) {
     cwd: path.dirname(base),
     contents: contents
   });
-}
+};
 
 var compile = function (metascript) {
   return Meta.compilerFromString(metascript).compile();
-}
+};
 
-describe('mjs', function() {
-  it('should compile a single metascript file', function(done) {
-    var code = "console.log 'Hello, Metascript!'";
-    var file = createFile('/src/path/file.mjs', new Buffer(code));
-    mjs()
-      .on('error', done)
+describe('mjs single file compilation', function() {
+
+  var code = "console.log 'Hello, Metascript!'";
+  var file = createFile('/src/path/file.mjs', new Buffer(code));
+  var expectedJsFilePath = '/src/path/file.js';
+
+  function assertJsFile(jsFile) {
+    jsFile.path.should.equal(expectedJsFilePath);
+    jsFile.contents.toString().should.equal(compile(code));
+  }
+
+  it('should emit single js file by default', function() {
+    var resultingFiles = [];
+    var stream = mjs()
       .on('data', function (data) {
-          data.path.should.equal('/src/path/file.js');
-          data.contents.toString().should.equal(compile(code));
-          done();
+         resultingFiles.push(data);
       })
-      .write(file);
+      .on('end', function () {
+         assertJsFile(resultingFiles[0]);
+         resultingFiles.length.should.equal(1);
+      });
+    stream.write(file);
+    stream.end();
+  });
+
+  it('should emit js file and source map when debug is true', function() {
+    var resultingFiles = [];
+    var stream = mjs({debug: true})
+      .on('data', function (data) {
+         resultingFiles.push(data);
+      })
+      .on('end', function () {
+         assertJsFile(resultingFiles[0]);
+         resultingFiles.length.should.equal(2);
+         var smFile = resultingFiles[1];
+         smFile.path.should.equal(expectedJsFilePath + '.map');
+      });
+    stream.write(file);
+    stream.end();
   });
 });
