@@ -39,9 +39,12 @@ module.exports = function (options) {
                 contents: new Buffer(content)}));
           };
           var jsFilePath = gutil.replaceExtension(file.path, '.js');
-          pushFile(jsFilePath, result.code);
           if (options.debug && result.map) {
-            pushFile(jsFilePath + '.map', result.map);
+            var smFilePath = jsFilePath + '.map';
+            pushFile(jsFilePath, result.code + "\n//# sourceMappingURL=" + path.basename(smFilePath));
+            pushFile(smFilePath, result.map);
+          } else {
+            pushFile(jsFilePath, result.code);
           }
           done();
         }));

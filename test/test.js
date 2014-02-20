@@ -25,9 +25,9 @@ describe('mjs single file compilation', function() {
   var file = createFile('/src/path/file.mjs', new Buffer(code));
   var expectedJsFilePath = '/src/path/file.js';
 
-  function assertJsFile(jsFile) {
+  function assertJsFile(jsFile, expectedSuffix) {
     jsFile.path.should.equal(expectedJsFilePath);
-    jsFile.contents.toString().should.equal(compile(code));
+    jsFile.contents.toString().should.equal(compile(code) + (expectedSuffix || ""));
   }
 
   it('should emit single js file by default', function() {
@@ -48,13 +48,14 @@ describe('mjs single file compilation', function() {
     var resultingFiles = [];
     var stream = mjs({debug: true})
       .on('data', function (data) {
-         resultingFiles.push(data);
+        resultingFiles.push(data);
       })
       .on('end', function () {
-         assertJsFile(resultingFiles[0]);
-         resultingFiles.length.should.equal(2);
-         var smFile = resultingFiles[1];
-         smFile.path.should.equal(expectedJsFilePath + '.map');
+        resultingFiles.length.should.equal(2);
+        var jsFile = resultingFiles[0];
+        var smFile = resultingFiles[1];
+        smFile.path.should.equal(expectedJsFilePath + '.map');
+        assertJsFile(jsFile, "\n//# sourceMappingURL=" + path.basename(smFile.path));
       });
     stream.write(file);
     stream.end();
