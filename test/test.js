@@ -61,3 +61,25 @@ describe('mjs single file compilation', function() {
     stream.end();
   });
 });
+
+describe('mjs error', function() {
+  var code = "foo";
+  var file = createFile('/src/path/file.mjs', new Buffer(code));
+
+  it('should be emitted as error event', function() {
+    var events = [];
+    var stream = mjs()
+          .on('data', function (data) {
+            events.push(data);
+          })
+          .on('error', function (error) {
+            events.push(error);
+          })
+          .on('end', function () {
+            events.length.should.equal(1);
+            events[0].message.should.equal('Undeclared identifier "foo"');
+          });
+    stream.write(file);
+    stream.end();
+  });
+});

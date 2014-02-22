@@ -30,6 +30,17 @@ module.exports = function (options) {
         function(line) { compiler.onLine(line); },
         function() {
           var result = compiler.done();
+          if (result.errors) {
+            var errors = result.errors;
+            if (errors.length > 0) {
+              for (var i = 0; i < errors.length; ++i) {
+                fileStream.emit('error', errors[i]);
+              }
+            } else {
+              fileStream.emit('error', new Error('Unknown compiler error'));
+            }
+            return done();
+          }
           function pushFile(path, content) {
             fileStream.push(
               new gutil.File({
