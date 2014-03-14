@@ -29,7 +29,13 @@ module.exports = function (options) {
       es.through(
         function(line) { compiler.onLine(line); },
         function() {
-          var result = compiler.done();
+          var result;
+          try {
+            result = compiler.done();
+          } catch (e) {
+            fileStream.emit('error', e);
+            return done();
+          }
           if (result.errors) {
             var errors = result.errors;
             if (errors.length > 0) {
