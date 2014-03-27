@@ -77,8 +77,9 @@ describe('mjs error', function() {
           })
           .on('end', function () {
             events.length.should.equal(1);
-            events[0].message.should.equal('Undeclared identifier "foo"');
-            events[0].toString().should.equal('path/file.mjs(1,0): Undeclared identifier "foo"');
+            var expected = 'Undeclared identifier "foo" (/src/path/file.mjs:1:0)';
+            events[0].message.should.equal(expected);
+            events[0].toString().should.equal(expected);
           });
     stream.write(file);
     stream.end();

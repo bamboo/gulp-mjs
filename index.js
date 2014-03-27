@@ -10,11 +10,11 @@ function streamify(obj) {
 }
 
 function errorForFile(file, error) {
-  var relativePath = path.join(path.relative(file.cwd, file.base), path.basename(file.path));
   var errorWithFile = Object.create(error);
+  error.message = error.message + ' (' + file.path + ':' + error.line + ':' + error.column + ')';
   error.path = file.path;
   error.toString = function() {
-    return relativePath + '(' + error.line + ',' + error.column + '): ' + error.message;
+    return this.message;
   };
   return errorWithFile;
 }
@@ -73,7 +73,7 @@ module.exports = function (options) {
           } else {
             pushFile(jsFilePath, result.code);
           }
-          done();
+          return done();
         }));
   }
 
