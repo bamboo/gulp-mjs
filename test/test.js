@@ -69,18 +69,18 @@ describe('mjs error', function() {
   it('should be emitted as error event', function() {
     var events = [];
     var stream = mjs()
-          .on('data', function (data) {
-            events.push(data);
-          })
-          .on('error', function (error) {
-            events.push(error);
-          })
-          .on('end', function () {
-            events.length.should.equal(1);
-            var expected = 'Undeclared identifier "foo" (/src/path/file.mjs:1:0)';
-            events[0].message.should.equal(expected);
-            events[0].toString().should.equal(expected);
-          });
+      .on('data', function (data) {
+        events.push(data);
+      })
+      .on('error', function (error) {
+        events.push(error);
+      })
+      .on('end', function () {
+        events.length.should.equal(1);
+        var expected = 'Undeclared identifier "foo" (/src/path/file.mjs:1:0)';
+        events[0].message.should.equal(expected);
+        events[0].toString().should.equal(expected);
+      });
     stream.write(file);
     stream.end();
   });
