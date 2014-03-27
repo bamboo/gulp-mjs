@@ -9,6 +9,16 @@ function streamify(obj) {
   return require('streamifier').createReadStream(obj);
 }
 
+function errorForFile(file, error) {
+  var relativePath = path.join(path.relative(file.cwd, file.base), path.basename(file.path));
+  var errorWithFile = Object.create(error);
+  error.path = file.path;
+  error.toString = function() {
+    return relativePath + '(' + error.line + ',' + error.column + '): ' + error.message;
+  };
+  return errorWithFile;
+}
+
 module.exports = function (options) {
 
   options = options || {debug: false};
@@ -40,7 +50,7 @@ module.exports = function (options) {
             var errors = result.errors;
             if (errors.length > 0) {
               for (var i = 0; i < errors.length; ++i) {
-                fileStream.emit('error', errors[i]);
+                fileStream.emit('error', errorForFile(file, errors[i]));
               }
             } else {
               fileStream.emit('error', new Error('Unknown compiler error'));
