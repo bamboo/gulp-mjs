@@ -32,7 +32,7 @@ module.exports = function (options) {
     }
 
     var stream = file.isStream() ? file.contents : streamify(file.contents);
-    var compiler = Meta.createLineStreamCompiler(file.path, options.debug ? {map: true, source: file.path} : undefined);
+    var compiler = Meta.createLineStreamCompiler(file.path, options.debug ? {map: true, source: file.path, fullMacroErrors: true} : undefined);
     return es.pipeline(
       stream,
       es.split(),
