@@ -31,8 +31,18 @@ module.exports = function (options) {
       return done();
     }
 
+    var compOptions = {};
+    if (options.debug) {
+      compOptions.source = file.path;
+      compOptions.fullMacroErrors = true;
+      compOptions.map = options.map || gutil.replaceExtension(file.path, '.js') + '.map';
+      compOptions.mapRoot = options.mapRoot || null;
+      compOptions.sourceInMap = options.sourceInMap || false;
+    }
+
     var stream = file.isStream() ? file.contents : streamify(file.contents);
-    var compiler = Meta.createLineStreamCompiler(file.path, options.debug ? {map: true, source: file.path, fullMacroErrors: true} : undefined);
+    var compiler = Meta.createLineStreamCompiler(file.path, compOptions);
+
     return es.pipeline(
       stream,
       es.split(),
@@ -67,9 +77,15 @@ module.exports = function (options) {
           };
           var jsFilePath = gutil.replaceExtension(file.path, '.js');
           if (options.debug && result.map) {
-            var smFilePath = jsFilePath + '.map';
-            pushFile(jsFilePath, result.code + "\n//# sourceMappingURL=" + path.basename(smFilePath));
-            pushFile(smFilePath, result.map);
+            var smComment = "//# sourceMappingURL=";
+            if (compOptions.map === '-' || compOptions.map === jsFilePath) {
+              smComment += "data:application/json;base64,";
+              smComment += new Buffer(result.map).toString('base64');
+            } else {
+              pushFile(compOptions.map, result.map);
+              smComment += path.basename(compOptions.map);
+            }
+            pushFile(jsFilePath, result.code + "\n" + smComment);
           } else {
             pushFile(jsFilePath, result.code);
           }
