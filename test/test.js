@@ -52,11 +52,26 @@ describe('mjs single file compilation', function() {
       })
       .on('end', function () {
         resultingFiles.length.should.equal(2);
-        var jsFile = resultingFiles[0];
-        var smFile = resultingFiles[1];
+        var smFile = resultingFiles[0];
+        var jsFile = resultingFiles[1];
         smFile.path.should.equal(expectedJsFilePath + '.map');
         assertJsFile(jsFile, "\n//# sourceMappingURL=" + path.basename(smFile.path));
       });
+    stream.write(file);
+    stream.end();
+  });
+
+  it('should embed source map when map option is "-"', function() {
+    var resultingFiles = [];
+    var stream = mjs({debug: true, map: '-'})
+      .on('data', function (data) {
+        resultingFiles.push(data);
+      })
+      .on('end', function () {
+        resultingFiles.length.should.equal(1);
+        var js = resultingFiles[0].contents.toString();
+        js.should.match(/^\/\/# sourceMappingURL=data:application\/json;base64,[A-Za-z0-9=\/\+]+$/m);
+      })
     stream.write(file);
     stream.end();
   });
