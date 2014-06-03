@@ -1,6 +1,6 @@
 {
   "name": "gulp-mjs",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Compiles Metascript files.",
   "main": "index.js",
   "dependencies": {
